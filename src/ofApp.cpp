@@ -4,80 +4,65 @@
 void ofApp::setup(){
     osc.setup(5000);
     
-    // make ellipse to draw along the length of the ptf
-    mesh.setMode(OF_PRIMITIVE_POINTS);
-    unsigned numVerts = 40;
-    float w = 20;
-    float h = 40;
-    for (unsigned i = 0; i < numVerts; ++i)
-    {
-        mesh.addVertex(ofVec3f(0.0f, w * cos(TWO_PI * i / (float)numVerts), h * sin(TWO_PI * i / (float)numVerts)));
-    }
     
     
     // this sets the camera's distance from the object
     cam.setDistance(100);
-//    cam.setPosition(ofVec3f(0,0,100));
-//    cam.lookAt(ofVec3f(0,0,0));
-//    cam.setFov(fov);
-
+    
+    //set up our voice tubes
+    int numVoices = 2;
+    for(int i = 0; i < numVoices; i++){
+        VoiceTube vt;
+        vt.init(i);
+        tubes.push_back(vt);
+    }
 
     gui.setup();
-    gui.add(maxNumSegments.set("max segs", 10, 10, 2000));
-    gui.add(smoothness.set("smoothness", 0, 0, 20));
-    gui.add(volumeThresh.set("volume thresh", 0.0, 0.0, 0.2));
-    gui.add(fov.set("fov", 10, 10, 100));
-    gui.add(speed.set("speed", 1, 0.01, 100.0));
+//    gui.add(maxNumSegments.set("max segs", 10, 10, 2000));
+//    gui.add(smoothness.set("smoothness", 0, 0, 20));
+//    gui.add(volumeThresh.set("volume thresh", 0.0, 0.0, 0.2));
+//    gui.add(speed.set("speed", 1, 0.01, 100.0));
     gui.add(camZ.set("cam Z", 100, -1000, 1000));
     gui.loadFromFile("settings.xml");
     
-    currentPos.set(0,0,0);
     
-    tube.init();
+    tubeParams.setup("tubeSettings.xml");
+    for(auto& vt : tubes){
+        tubeParams.add(vt.params);
+    }
+    tubeParams.loadFromFile("tubeSettings.xml");
+    tubeParams.setPosition(gui.getWidth() + 20, 10);
+    
+    syphon.setName("brass");
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    receiveOsc();
-//    cam.setFov(fov);
-////    cam.lookAt(ofVec3f(ofGetWidth()/2, ofGetHeight()/2, 0));
-//    
-//    cam.setPosition(currentPos.x, 200, 2000);
-//    cam.lookAt(ofVec3f(currentPos.x, 200, 0));
-
-
     
-    if(vol > volumeThresh) {
-        currentPos.y = ofMap(freq, 0, 1000, ofGetHeight(), 0);
-        currentPos.x += vol*speed;
-        currentPos.z = ofNoise(ofGetElapsedTimeMillis() * 0.01) * 1.0;
-    } else {
-        currentPos.y = ofGetHeight();
+    //receive osc and update params of each voicetube
+    receiveOsc();
+    
+    
+    //we need an average x location;
+    //update all of the voice tubes
+    int avgX = 0;
+    for(auto& vt : tubes){
+        vt.update();
+        avgX += vt.currentPos.x;
     }
     
+    //get average x loc
+    avgX = avgX/tubes.size();
     
-    pl.addVertex(currentPos);
-    ptf.addPoint(currentPos);
-    
-        cam.setPosition(currentPos.x, 200, camZ);
-        cam.lookAt(ofVec3f(currentPos.x, ofGetHeight()/2, 0));
-    
-    cull();
-    
-    ofPolyline p = pl.getSmoothed(smoothness);
-    tube.setup(p, 20);
-    tube.update();
+   
+    //update camera position
+    cam.setPosition(ofVec3f(avgX, 200, camZ));
+    cam.lookAt(ofVec3f(avgX, ofGetHeight()/2, 0));
+
     
 }
 
-//--------------------------------------------------------------
-void ofApp::addPoint(ofVec3f _vec){
-    pl.addVertex(_vec);
-    ptf.addPoint(_vec);
-    
-    cull();
 
-}
 
 //--------------------------------------------------------------
 void ofApp::draw(){
@@ -88,37 +73,19 @@ void ofApp::draw(){
     
     cam.begin();
     ofScale(1, -1, 1);
-    
-//    ofPushMatrix();
-    ofTranslate(0, -1000,0);
-    ofSetColor(200, 10, 30);
-    pl.getSmoothed(smoothness).draw();
-    
-    ofSetColor(255, 100);
-//    tube.draw();
-//    tube.drawNormals(15);
-    tube.drawTubeRings();
-    
-//    ofSetColor(255);
-//    for (int i = 0; i < ptf.framesSize(); ++i)
-//    {
-//        ofPushMatrix();
-//        
-//        // multiply current matrix (rotated around x axis)
-//        // by transform for next frame
-//        ofMultMatrix(ptf.frameAt(i));
-//        
-//        // draw ellipse
-//        mesh.draw();
-//        ofPopMatrix();
-//    }
-    
-//    ofPopMatrix();
+    ofTranslate(0, -1500,0);
+   
+    for(auto& vt : tubes){
+        vt.draw();
+    }
     
     cam.end();
+    
+    syphon.publishScreen();
 
     ofDisableDepthTest();
     gui.draw();
+    tubeParams.draw();
 }
 
 //--------------------------------------------------------------
@@ -128,48 +95,26 @@ void ofApp::receiveOsc(){
         ofxOscMessage m;
         
         if(osc.getNextMessage(m)){
+            
+            //  /voice ID freq vol
             if(m.getAddress() == "/voice"){
                 int ID = m.getArgAsInt(0);
-                
-                
                 freq = m.getArgAsFloat(1);
                 vol = m.getArgAsFloat(2);
                 
-//                currentPos.y = ofMap(freq, 0.0, 2,000, ofGetHeight(), 100.0);
-                ofLog() << "ID: " << ID << " freq: " << freq;
+                //if the ID is within range
+                if(ID < tubes.size()){
+                    tubes[ID].freq = freq;
+                    tubes[ID].vol = vol;
+                }
+                
 
-//                currentPos.y = ofMap(volume, 0.0, 0.8, ofGetHeight(),100.0);
-                
-                
-//                if(volume > volumeThresh){
-//                    ptf.addPoint(ofVec3f(freq, y, z));
-//                    pl.addVertex(ofVec3f(freq, y, z));
-//                    cull();
-//                }
             }
         }
     }
  
 }
 
-//---------------------------------------------------------
-void ofApp::cull(){
-    if(ptf.getFrames().size() > maxNumSegments){
-        
-        
-        int diff = ptf.getFrames().size() - maxNumSegments;
-        
-        ofLog() << "ptf size: " << ptf.getFrames().size() << " culling " << diff << " frames.";
-        
-        pl.getVertices().erase(pl.getVertices().begin(), pl.getVertices().begin() + diff);
-        
-        
-        for(int i = 0; i < diff; i++){
-            ptf.getFrames().pop_front();
-        }
-        
-    }
-}
 
 
 //--------------------------------------------------------------

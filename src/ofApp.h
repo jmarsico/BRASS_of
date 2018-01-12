@@ -1,10 +1,10 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxPtf.h"
 #include "ofxGui.h"
 #include "ofxOsc.h"
-#include "ofxTubePrimitive.h"
+#include "ofxSyphon.h"
+#include "voiceTube.h"
 
 class ofApp : public ofBaseApp{
 
@@ -31,30 +31,30 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
     
     
-    ofxPtf ptf;
-    ofPolyline pl;
-    ofVboMesh mesh;
+
     
     ofxOscReceiver osc;
     
+    vector<VoiceTube> tubes;
     
     ofxPanel gui;
     ofParameter<int> maxNumSegments;
     ofParameter<int> smoothness;
     ofParameter<float> volumeThresh;
-    ofParameter<float> fov;
     ofParameter<float> speed;
     ofParameter<float> camZ;
     
-    ofVec3f currentPos;
+    
+    ofxPanel tubeParams;
+    
     float freq;
     float vol;
     
     
     ofEasyCam cam;
     
-    ofxTubePrimitive tube;
     
+    ofxSyphonServer syphon;
     
     
 		

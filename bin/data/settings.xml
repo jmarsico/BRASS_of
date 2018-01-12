@@ -1,9 +1,4 @@
 <group>
-	<max_segs>199</max_segs>
-	<smoothness>2</smoothness>
-	<volume_thresh>0.005</volume_thresh>
-	<fov>10</fov>
-	<speed>22.5077</speed>
+	<cam_Z>380</cam_Z>
 <group/>
-	<cam_Z>700</cam_Z>
 </group>
