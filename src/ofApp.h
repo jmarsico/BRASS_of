@@ -38,11 +38,9 @@ class ofApp : public ofBaseApp{
     vector<VoiceTube> tubes;
     
     ofxPanel gui;
-    ofParameter<int> maxNumSegments;
-    ofParameter<int> smoothness;
-    ofParameter<float> volumeThresh;
-    ofParameter<float> speed;
+
     ofParameter<float> camZ;
+    ofParameter<float> camY;
     
     
     ofxPanel tubeParams;

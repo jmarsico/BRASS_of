@@ -25,7 +25,9 @@ void VoiceTube::init(int _id){
 
     ID = _id;
     
-    params.setName(ofToString(ID));
+    string id = "ID";
+    id+=ofToString(ID);
+    params.setName(id);
     params.add(maxNumSegments.set("max points", 100, 50, 3000));
     params.add(smoothness.set("smooth", 1, 0, 30));
     params.add(volumeThresh.set("volume thresh", 0.0, 0.0, 0.3));
@@ -63,14 +65,24 @@ void VoiceTube::draw(){
     ofSetColor(200, 10, 30);
     pl.getSmoothed(smoothness).draw();
     
-    ofSetColor(255, 100);
+    ofSetColor(255,0, 255*ID);
     
     switch (drawMode){
-        case 1: tube.draw();
-        case 2: tube.drawNormals(15);
-        case 3: tube.drawTubeRings();
-        case 4: tube.drawTubeSkeleton();
-        case 5: tube.drawTubeTangents();
+        case 1:
+            tube.draw();
+            break;
+        case 2:
+            tube.drawNormals(15);
+            break;
+        case 3:
+            tube.drawTubeRings();
+            break;
+        case 4:
+            tube.drawTubeSkeleton();
+            break;
+        case 5:
+            tube.drawTubeTangents();
+            break;
     }
 
 }

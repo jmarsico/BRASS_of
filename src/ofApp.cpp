@@ -56,7 +56,7 @@ void ofApp::update(){
     
    
     //update camera position
-    cam.setPosition(ofVec3f(avgX, 200, camZ));
+    cam.setPosition(ofVec3f(avgX, ofGetHeight()/2, camZ));
     cam.lookAt(ofVec3f(avgX, ofGetHeight()/2, 0));
 
     
