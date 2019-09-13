@@ -1,0 +1,17 @@
+<group>
+	<ID0>
+		<max_points>200</max_points>
+		<smooth>18</smooth>
+		<volume_thresh>0.0260204</volume_thresh>
+		<speed>49.9949</speed>
+		<draw_mode>1</draw_mode>
+	</ID0>
+	<ID1>
+		<max_points>200</max_points>
+		<smooth>17</smooth>
+		<volume_thresh>0.0290816</volume_thresh>
+		<speed>51.5102</speed>
+		<draw_mode>1</draw_mode>
+	</ID1>
+<group/>
+</group>

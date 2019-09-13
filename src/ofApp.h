@@ -41,18 +41,19 @@ class ofApp : public ofBaseApp{
 
     ofParameter<float> camZ;
     ofParameter<float> camY;
+    ofParameter<float> camX;
+    ofParameter<float> diffuse;
+    ofParameter<float> ambient;
+    ofParameter<float> atten;
     
     
     ofxPanel tubeParams;
-    
     float freq;
     float vol;
-    
-    
     ofEasyCam cam;
-    
-    
     ofxSyphonServer syphon;
+    
+    ofLight light;
     
     
 		

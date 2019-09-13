@@ -44,9 +44,9 @@ void VoiceTube::update(){
     if(vol > volumeThresh) {
         currentPos.y = ofMap(freq, 0, 1000, ofGetHeight(), 0);
         currentPos.x += vol * speed;
-        currentPos.z = ofNoise(ofGetElapsedTimeMillis() * 0.01) * 5.0;
+        currentPos.z = ofNoise(ofGetElapsedTimeMillis() * 0.01) * 50.0;
     } else {
-        currentPos.y = ofGetHeight();
+//        currentPos.y = ofGetHeight();
     }
     
     
@@ -62,10 +62,13 @@ void VoiceTube::update(){
 
 //---------------------------------------------------------
 void VoiceTube::draw(){
+    
+    ofPushMatrix();
+    ofTranslate(0,0,200 * ID);
     ofSetColor(200, 10, 30);
     pl.getSmoothed(smoothness).draw();
     
-    ofSetColor(255,0, 255*ID);
+    ofSetColor(255);
     
     switch (drawMode){
         case 1:
@@ -84,6 +87,8 @@ void VoiceTube::draw(){
             tube.drawTubeTangents();
             break;
     }
+    
+    ofPopMatrix();
 
 }
 

@@ -1,18 +1,9 @@
 <group>
-	<ID0>
-		<max_points>546</max_points>
-		<smooth>30</smooth>
-		<volume_thresh>0.114796</volume_thresh>
-		<speed>62.6224</speed>
-		<draw_mode>1</draw_mode>
-	</ID0>
-	<ID1>
-		<max_points>516</max_points>
-		<smooth>7</smooth>
-		<volume_thresh>0.0688776</volume_thresh>
-		<speed>62.1173</speed>
-		<draw_mode>3</draw_mode>
-	</ID1>
+	<cam_Z>-460</cam_Z>
+	<cam_Y>1180</cam_Y>
+	<cam_X>-410</cam_X>
+	<diffuse>1</diffuse>
+	<ambient>0.1</ambient>
+	<atten>1</atten>
 <group/>
-<cam_Z>1000</cam_Z>
 </group>

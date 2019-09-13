@@ -7,7 +7,10 @@ void ofApp::setup(){
     
     
     // this sets the camera's distance from the object
-    cam.setDistance(100);
+//    cam.setDistance(100);
+    
+    light.setDirectional();
+    ofEnableLighting();
     
     //set up our voice tubes
     int numVoices = 2;
@@ -23,10 +26,16 @@ void ofApp::setup(){
 //    gui.add(volumeThresh.set("volume thresh", 0.0, 0.0, 0.2));
 //    gui.add(speed.set("speed", 1, 0.01, 100.0));
     gui.add(camZ.set("cam Z", 100, -1000, 1000));
+    gui.add(camY.set("cam Y", ofGetHeight()/2, -100, ofGetHeight() +100));
+    gui.add(camX.set("cam X", 0, -500, 500));
+    gui.add(diffuse.set("diffuse", 1.0, 0.0, 1.0));
+    gui.add(ambient.set("ambient", 0.0, 0.0, 1.0));
+    gui.add(atten.set("atten", 0.0, 0.0, 1.0));
+    
     gui.loadFromFile("settings.xml");
     
     
-    tubeParams.setup("tubeSettings.xml");
+    tubeParams.setup("tube", "tubeSettings.xml");
     for(auto& vt : tubes){
         tubeParams.add(vt.params);
     }
@@ -55,9 +64,14 @@ void ofApp::update(){
     avgX = avgX/tubes.size();
     
    
+    light.setPosition(ofVec3f(avgX, -10, 0));
+    light.lookAt(ofVec3f(avgX, ofGetHeight()/2, 0));
+    light.setDiffuseColor(ofFloatColor(diffuse));
+    light.setAmbientColor(ofFloatColor(ambient));
+    light.setAttenuation(atten);
     //update camera position
-    cam.setPosition(ofVec3f(avgX, ofGetHeight()/2, camZ));
-    cam.lookAt(ofVec3f(avgX, ofGetHeight()/2, 0));
+    cam.setPosition(ofVec3f(avgX + camX, camY, camZ));
+    cam.lookAt(ofVec3f(avgX, ofGetHeight()/2 + 200, 0));
 
     
 }
@@ -68,6 +82,7 @@ void ofApp::update(){
 void ofApp::draw(){
     ofBackground(0);
     ofEnableDepthTest();
+    ofEnableLighting();
     
     ofSetColor(255);
     
@@ -75,6 +90,8 @@ void ofApp::draw(){
     ofScale(1, -1, 1);
     ofTranslate(0, -1500,0);
    
+    light.enable();
+    
     for(auto& vt : tubes){
         vt.draw();
     }
@@ -84,6 +101,7 @@ void ofApp::draw(){
     syphon.publishScreen();
 
     ofDisableDepthTest();
+    ofDisableLighting();
     gui.draw();
     tubeParams.draw();
 }
